@@ -1,0 +1,21 @@
+name: Validate skills
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/validate-skills.mjs
+      - name: Shell scripts parse
+        run: for f in $(find skills -name '*.sh'); do sh -n "$f" || exit 1; done
