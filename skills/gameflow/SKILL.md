@@ -89,7 +89,8 @@ Ask what the game needs, then recommend one of these:
 - **No backend yet?** The customer needs *some* trusted server to hold the key. Options:
   - **Supabase edge functions:** documented at docs.gameflow.gg/backend-integrations/supabase.
   - **A small Node service:** see docs.gameflow.gg/backend-integrations/custom-backend and the public sample `GameFlowGG/gameflow-custom-game-backend`.
-  - Nakama, Talo and EOS integrations are listed as coming soon. Don't promise them.
+  - **Nakama:** a server-side TypeScript runtime module exposes RPCs that start and stop GameFlow servers. It's documented at docs.gameflow.gg/backend-integrations/nakama, and the key stays in Nakama's runtime config.
+  - Talo and EOS integrations are listed as coming soon. Don't promise them.
 
 Full flow diagrams and the responsibilities of each component are in [references/architecture.md](references/architecture.md).
 
