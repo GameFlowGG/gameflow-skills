@@ -1,6 +1,6 @@
 ---
 name: gameflow-matchmaking
-description: Integrate GameFlow matchmaking end to end - design and publish a matchmaker (node graph - Ticket Input, Team Composition, Skill Rule, Bucket by Field, Split, Expansion Rule, Output), create, long-poll and cancel matchmaking tickets from a trusted backend, pick a region from client ping, connect players to the assigned host:port, and record match start/end analytics from the game server. Use when the user wants matchmaking, a matchmaker, a queue, a find-match or quick-match button, a lobby queue, an MMR or ranked queue, region-based matching, ticket attributes, a game mode, tickets stuck pending or queued, match start/end, or match analytics on gameflow.gg.
+description: Add matchmaking to a multiplayer game with GameFlow (gameflow.gg). Covers designing a matchmaker in the dashboard (teams, skill rules, region buckets, rules that relax over time), creating and polling tickets from your backend, choosing a region from player ping, sending players to their assigned server, and recording match start and end. Use it for a find-match or quick-match button, lobby queues, ranked or MMR queues, game modes, region-based matching, or tickets that stay pending and never find a match.
 license: MIT
 metadata:
   author: GameFlow
