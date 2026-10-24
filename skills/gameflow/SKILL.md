@@ -1,6 +1,6 @@
 ---
 name: gameflow
-description: Start here for any GameFlow task — dedicated game server hosting, matchmaking or skill rating on gameflow.gg. Sets up the account, API key, CLI and API access, explains the platform's architecture and rules (where the API key may live, base URL, JSON conventions), and routes to the right GameFlow skill. Use when the user mentions GameFlow, gameflow.gg, GAMEFLOW_API_KEY, or wants to add multiplayer hosting/matchmaking to a game and is choosing a backend.
+description: Online multiplayer backend for games, covering dedicated server hosting, matchmaking and player skill rating on GameFlow (gameflow.gg). Start here to set up a GameFlow account, API key and CLI, understand how the platform fits together and where the API key is allowed to live, and find the right GameFlow skill for the job. Use it when someone mentions GameFlow or GAMEFLOW_API_KEY, or is adding online multiplayer to a game and choosing a backend.
 license: MIT
 metadata:
   author: GameFlow

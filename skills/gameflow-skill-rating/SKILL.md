@@ -1,6 +1,6 @@
 ---
 name: gameflow-skill-rating
-description: Add GameFlow skill rating (OpenSkill-based, TrueSkill-like MMR/ELO alternative) to a game. Covers the dashboard checklist for creating a rating model and attaching it to a matchmaker, reporting match results from the dedicated server or backend (POST /v1/skill-rating/matches:report, ranks, teams, retries and the fact that reports are NOT idempotent), reading player ratings and ranks (player-rating:resolve, ordinal, batchGet for lobbies), leaderboards with cursor pagination, seasons, and seeding or migrating existing ratings. Use when the user mentions skill rating, MMR, ELO, OpenSkill, TrueSkill, rank, ranked mode, leaderboard, report match result, player rating, mu/sigma, balanced or skill-based matchmaking, or seasons on GameFlow.
+description: Rank players in a competitive game with GameFlow skill rating (gameflow.gg), an OpenSkill-based alternative to Elo and TrueSkill. Explains creating a rating model and attaching it to a matchmaker, reporting match results from the game server or backend (reports are not idempotent, so retries need care), reading player ratings and ranks, building leaderboards, running seasons, and importing ratings from an existing system. Use it for MMR, Elo, ranked modes, leaderboards, skill-balanced matchmaking or seasons.
 license: MIT
 metadata:
   author: GameFlow

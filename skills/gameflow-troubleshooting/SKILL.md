@@ -1,6 +1,6 @@
 ---
 name: gameflow-troubleshooting
-description: Diagnose a broken GameFlow integration (gameflow.gg dedicated server hosting, matchmaking, skill rating). Use when the user reports a GameFlow error or API failure (401, 403, 404, 400 "is required", 429 ResourceExhausted, FailedPrecondition), a build failed or stuck in queued/running, a game server never becomes Ready or keeps restarting, players can't connect to the server (UDP/TCP/TLS, wrong port or host), allocation failed ("no available game servers"), a matchmaking ticket is rejected or stuck pending / no match found, the GAMEFLOW_PAYLOAD / launch payload is empty, ratings not updating after matches:report, or wants to debug game server logs, events or metrics. Walks a triage flow from the exact error body to the cause, the check and the fix, using real GameFlow error messages.
+description: Fix a broken game server, matchmaking or skill rating integration on GameFlow (gameflow.gg). Starts from the exact error or symptom and works through the cause, the check and the fix for API errors (401, 403, 404, 429, FailedPrecondition), builds that fail or stay queued, servers that never become Ready or keep restarting, players who can't connect, "no available game servers" on allocation, matchmaking tickets stuck pending, an empty launch payload, or ratings that don't update. Use it whenever a GameFlow integration isn't working or you need to dig into server logs, events or metrics.
 license: MIT
 metadata:
   author: GameFlow

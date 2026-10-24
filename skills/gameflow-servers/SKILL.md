@@ -1,6 +1,6 @@
 ---
 name: gameflow-servers
-description: Host dedicated game servers on GameFlow (gameflow.gg). Integrates the GameFlow Game Server SDK into a Unity, Unreal, Godot, Node/TypeScript (Colyseus), Go or Rust/Bevy dedicated server (connect, Ready, player tracking, Shutdown), reads the port from GAMEFLOW_DEFAULT_PORT and the launch payload (GAMEFLOW_PAYLOAD) through the SDK, packages the server build (managed engine template or your own Dockerfile), uploads it with the gameflow CLI, a GitHub Action or the REST API (single or multipart), polls the build, then starts a test server or allocates one from the autoscaled fleet and connects to host:port. Use for game server hosting, deploy server build, upload build, CI deploy, allocate server, server ports, TLS/WSS servers, player tracking, idle servers being shut down, or migrating from Agones/raw Kubernetes.
+description: Host your game's dedicated servers on GameFlow (gameflow.gg). Walks through adding the GameFlow Game Server SDK to a Unity, Unreal, Godot, Node/TypeScript (Colyseus), Go or Rust/Bevy server, packaging the Linux build, uploading it from the CLI, GitHub Actions or the REST API, and getting players connected to a running server's host and port. Use it to deploy a server build, set up CI uploads, start a test server, allocate servers from an autoscaled fleet, configure ports or TLS/WSS, track connected players, find out why idle servers shut down, or move off a self-managed Kubernetes setup.
 license: MIT
 metadata:
   author: GameFlow
@@ -9,7 +9,7 @@ metadata:
 
 # GameFlow dedicated servers
 
-You ship a Linux server build. GameFlow builds it into an image, runs it in your regions, autoscales it and hands players a `host:port`. Your server process talks to the platform only through the **GameFlow Game Server SDK** (never the Agones SDK directly).
+You ship a Linux server build. GameFlow builds it into an image, runs it in your regions, autoscales it and hands players a `host:port`. Your server process talks to the platform only through the **GameFlow Game Server SDK**.
 
 Account, API key and CLI setup live in the `gameflow` skill. The essentials, repeated here:
 - API base `https://api.gameflow.gg/v1`, header `x-api-key: $GAMEFLOW_API_KEY`.
