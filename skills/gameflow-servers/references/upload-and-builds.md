@@ -19,7 +19,7 @@ gameflow builds create --game-id "$GAMEFLOW_GAME_ID" --file ./dist/server.zip --
 ```
 
 **Notes:**
-- With `GAMEFLOW_API_KEY` set, no `login` step is needed.
+- Locally, run `gameflow login` once. In CI, set `GAMEFLOW_API_KEY` and skip the `login` step.
 - `builds create` **waits for the image build** and prints `{buildId, status, message, imageUri, …}`. A failed build exits with code `6`. Don't poll the REST API afterwards; use `--no-wait` only if you want to poll yourself.
 - `gameflow builds status --build-id <id>` checks a build later. The full command list is in the `gameflow` skill's `references/cli.md`, and `gameflow schema` prints every flag.
 - Use a unique `--version` per upload, e.g. a tag or commit SHA. A duplicate is not rejected (the build id gets a random prefix), but it makes builds hard to tell apart.

@@ -30,7 +30,7 @@ Skill Rating is labelled **Alpha** in the docs. Field names below were checked a
 
 ## 1. Dashboard checklist (human)
 
-There are no public endpoints for creating models, attaching them or managing seasons. Give the user these steps and wait for confirmation:
+The CLI can create a model: `gameflow models create --name <n> --match-format <f> …` (flags in the `gameflow` skill's CLI reference). Attaching it to a matchmaker and managing seasons are dashboard-only. Give the user these steps and wait for confirmation:
 
 1. **Rating Models → Create Rating Model** (https://app.gameflow.gg/rating-models):
    - **Mode name**, e.g. `Ranked 2v2`.

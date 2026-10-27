@@ -18,18 +18,23 @@ The installer puts the binary in `~/.gameflow/bin` and appends a PATH line to `~
 
 ## Authentication
 
+**On a dev machine, run `gameflow login`.** It opens the browser, the user approves, and the CLI stores a session that renews itself. Don't ask the user to create an API key or set an environment variable for this. Check it with `gameflow whoami`.
+
+**In CI, scripts and headless shells, use an API key** (the second option). Set `GAMEFLOW_API_KEY` and there is no `login` step.
+
 The CLI uses the first credential it finds:
 1. `GAMEFLOW_TOKEN`: a short-lived token that GameFlow's in-app terminal sets. Don't set it yourself.
-2. `GAMEFLOW_API_KEY` from the environment. **CI and agents need nothing else: no `login` step.**
-3. The key stored by `gameflow login` in `~/.gameflow/config.yaml`.
+2. `GAMEFLOW_API_KEY` from the environment. **It wins over a stored login**, so a stale value silently overrides `gameflow login`.
+3. The session stored by `gameflow login` in `~/.gameflow/config.yaml`.
+4. A key stored by `gameflow login --api-key-stdin`.
 
-To store a key on a dev machine, pipe it so it stays out of shell history and the process list:
+To store a key instead of using the browser (no browser available), pipe it so it stays out of shell history and the process list:
 ```bash
 printf '%s' "$GAMEFLOW_API_KEY" | gameflow login --api-key-stdin
 gameflow whoami
 ```
 
-`GAMEFLOW_API_URL` overrides the base URL, which defaults to `https://api.gameflow.gg/v1`.
+`GAMEFLOW_API_URL` overrides the base URL, which defaults to `https://api.gameflow.gg/v1`. If calls hit the wrong environment, check that variable in the shell profile first.
 
 ## Output and exit codes
 
@@ -42,10 +47,14 @@ gameflow whoami
 | Command | What it does |
 |---|---|
 | `gameflow whoami` | Shows the authenticated user and organization |
-| `gameflow login --api-key-stdin` (or `--api-key <key>`) | Stores the key in `~/.gameflow/config.yaml` |
-| `gameflow logout` | Removes the stored key. It has no effect on `GAMEFLOW_API_KEY` |
+| `gameflow login` | Signs in through the browser and stores a session in `~/.gameflow/config.yaml` |
+| `gameflow login --api-key-stdin` (or `--api-key <key>`) | Stores an API key instead, for headless machines |
+| `gameflow logout` | Revokes the browser session and removes stored credentials. It has no effect on `GAMEFLOW_API_KEY` |
 | `gameflow games list [--page N] [--page-size N]` | Lists the organization's games, with their ids |
 | `gameflow games get --game-id <id>` | Shows one game |
+| `gameflow games create --title <t> --engine <e> --port <p> [--protocol UDP\|TCP] [--vcpu 500m] [--memory 512Mi] [--region <r>…] [--engine-version <v>] [--description <d>] [--tag <t>…]` | Creates a game. `--engine` is `Unity`, `Unreal`, `Godot`, `Colyseus` or `Custom`; `--region` defaults to `us-east` |
+| `gameflow matchmakers create --game-id <id> --name <n> [--description <d>]` | Creates a matchmaker record. Its flow is set up in the dashboard |
+| `gameflow models create --name <n> --match-format <f> [--scored-by <s>] [--rating-algorithm <a>] [--number-of-teams N] [--players-per-team N] [--status <s>]` | Creates a skill rating model. `--match-format` is `MATCH_FORMAT_TEAMS`, `MATCH_FORMAT_FFA` or `MATCH_FORMAT_BATTLE_ROYALE`; it goes live unless `--status SKILL_MODEL_STATUS_DRAFT` |
 | `gameflow regions list` | Lists the available regions |
 | `gameflow builds create --game-id <id> --file <archive> --version <v>` | Uploads a build and **waits for the image build to finish** (see below) |
 | `gameflow builds list --game-id <id> [--page-size N] [--page-token T]` | Lists a game's builds |
