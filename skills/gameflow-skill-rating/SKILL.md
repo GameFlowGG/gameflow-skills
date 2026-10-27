@@ -13,7 +13,7 @@ GameFlow stores and computes player ratings for you. Each player has **μ (mu)**
 
 Account setup, API keys, base URL and JSON conventions are covered in the `gameflow` skill. Queues and tickets are covered in `gameflow-matchmaking`, and the server SDK and payload in `gameflow-servers`. This skill doesn't repeat them.
 
-Skill Rating is labelled **Alpha** in the docs. Field names below were checked against the API code (develop, 2026-10).
+Skill Rating is labelled **Alpha** in the docs. Field names below were checked against the API code (develop, 2026-10). If the GameFlow docs MCP is connected, check each request body against `get_api_operation` before writing it. If a field name differs from this skill, **don't choose yourself or write code with either name**. The docs can be ahead of the deployed API, and the wrong name is silently dropped. Show the user both names and ask which one their environment accepts.
 
 ## Rules
 

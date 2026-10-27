@@ -6,24 +6,68 @@
 ```bash
 curl -fsSL https://install.gameflow.gg | sh
 export PATH="$HOME/.gameflow/bin:$PATH"
-gameflow --version
+gameflow version
 ```
 The installer puts the binary in `~/.gameflow/bin` and appends a PATH line to `~/.zshrc`, `~/.bashrc` or `~/.bash_profile`. **The current shell isn't updated**, so `curl … | sh && gameflow login …` fails unless you export PATH first, as shown above.
 
-**Windows:** download `gameflow-windows-<arch>` from https://github.com/GameFlowGG/gameflow-cli-releases/releases and put it on PATH. Or use WSL with the Linux steps.
+**Windows:** download `gameflow-windows-<arch>` from https://github.com/GameFlowGG/gameflow-cli-releases/releases and put it on PATH. Or use WSL with the Linux steps. The install script exits on Windows, Git Bash included.
+
+## Discover commands with `gameflow schema`
+
+`gameflow schema` prints every command, flag, environment variable and exit code as JSON. **Run it before using a command or flag that isn't listed below**, rather than guessing or parsing `--help`.
+
+## Authentication
+
+The CLI uses the first credential it finds:
+1. `GAMEFLOW_TOKEN`: a short-lived token that GameFlow's in-app terminal sets. Don't set it yourself.
+2. `GAMEFLOW_API_KEY` from the environment. **CI and agents need nothing else: no `login` step.**
+3. The key stored by `gameflow login` in `~/.gameflow/config.yaml`.
+
+To store a key on a dev machine, pipe it so it stays out of shell history and the process list:
+```bash
+printf '%s' "$GAMEFLOW_API_KEY" | gameflow login --api-key-stdin
+gameflow whoami
+```
+
+`GAMEFLOW_API_URL` overrides the base URL, which defaults to `https://api.gameflow.gg/v1`.
+
+## Output and exit codes
+
+- Commands print JSON on stdout, errors included: `{"code":"unauthenticated","error":"…"}`. Add `--pretty` to indent it. The exception is `servers logs` (see below).
+- `--debug` logs the underlying HTTP calls to stderr. A progress bar also goes to stderr, only when it's a terminal.
+- **Exit codes:** `2` usage or invalid argument, `3` unauthenticated or permission denied, `4` not found, `5` network, `6` build failed, `7` timeout, `1` anything else.
 
 ## Commands
 
-These are the documented commands. For anything else, run `gameflow --help` rather than guessing flags.
-
 | Command | What it does |
 |---|---|
-| `gameflow login --api-key <key>` | Stores the key locally for later commands |
 | `gameflow whoami` | Shows the authenticated user and organization |
-| `gameflow logout` | Removes the stored key |
-| `gameflow builds create --game-id <gameId> --file <archive> --version <version>` | Uploads a server build archive and starts the image build; prints the build id |
+| `gameflow login --api-key-stdin` (or `--api-key <key>`) | Stores the key in `~/.gameflow/config.yaml` |
+| `gameflow logout` | Removes the stored key. It has no effect on `GAMEFLOW_API_KEY` |
+| `gameflow games list [--page N] [--page-size N]` | Lists the organization's games, with their ids |
+| `gameflow games get --game-id <id>` | Shows one game |
+| `gameflow regions list` | Lists the available regions |
+| `gameflow builds create --game-id <id> --file <archive> --version <v>` | Uploads a build and **waits for the image build to finish** (see below) |
+| `gameflow builds list --game-id <id> [--page-size N] [--page-token T]` | Lists a game's builds |
+| `gameflow builds status --build-id <id>` | Shows one build's status and message |
+| `gameflow builds tag --game-id <id> --build-id <id> --tag <t>…` | **Replaces** a build's tags (repeat `--tag`) |
+| `gameflow servers list --game-id <id> [--search S] [--sort latest\|oldest\|name\|status] [--limit N]` | Lists servers |
+| `gameflow servers launch --game-id <id> --region <r> [--payload '<json>']` | Starts a server and returns at once, before it's Ready |
+| `gameflow servers logs --game-id <id> --region <r> --server-name <n> --tail 200` | Prints a server's logs |
+| `gameflow servers stop --game-id <id> --region <r> --server-name <n> [--dry-run]` | Stops a server |
+| `gameflow version` | Shows the CLI version |
 
-The CLI talks to `https://api.gameflow.gg/v1` by default.
+**`builds create`:**
+- It handles both single and multipart uploads, then polls until the build is `success` or `failed`.
+- It prints `{buildId, s3Path, status, message, imageUri, tags}`. A failed build exits with code `6`. Its `message` and `GET /v1/images/builds/{buildId}/logs` say why.
+- `--no-wait` returns right after the build starts. `--timeout 30m` caps the wait (exit `7`), but the build keeps running: check it with `builds status` instead of uploading again. `--tag stable` tags the build in the same step.
+- Give each upload its own `--version`, e.g. a tag or commit SHA. A duplicate isn't rejected (the build id gets a prefix), but it makes builds hard to tell apart.
+- It doesn't make the build current. Promoting is dashboard-only (see the `gameflow-servers` skill). Tags are labels only.
+
+**`servers`:**
+- `launch` is the start call without the wait. It doesn't allocate from the fleet; fleet allocation is API-only (see the `gameflow-servers` skill). It prints the server's `name`, `state`, `address` and `port`. Poll `servers list --search <name>` until `state` is `Ready`.
+- `logs` **streams raw text forever by default.** In scripts and agent runs, always pass `--tail N` or `--no-follow`. These print one JSON object per line, `{"message":"…"}`, not a single JSON document.
+- Run `stop` with `--dry-run` first to check you have the right server.
 
 ## GitHub Actions
 
@@ -34,7 +78,7 @@ The CLI talks to `https://api.gameflow.gg/v1` by default.
     api-key: ${{ secrets.GAMEFLOW_API_KEY }}
 ```
 
-**Full deploy (install, login, upload the build, output the build id):**
+**Full deploy (install, upload, wait for the build, output the build id):**
 ```yaml
 - name: Deploy server build to GameFlow
   id: gameflow
@@ -50,9 +94,9 @@ The CLI talks to `https://api.gameflow.gg/v1` by default.
 **Notes:**
 - Store the key as a repository or environment **secret** named `GAMEFLOW_API_KEY`, ideally a dedicated `ci` key with an expiry.
 - The game id is not secret. A repository **variable** is fine.
-- `version` must be unique per game. Reusing one fails, so use tags or `${{ github.sha }}`.
+- Use a unique `version` per upload, e.g. tags or `${{ github.sha }}`. Duplicates are accepted but hard to tell apart.
 - The actions' `version` / `cli-version` inputs are reserved: the latest CLI is always installed.
 
 ## Other CI systems
 
-Run the same three steps: install, export PATH, then `gameflow login --api-key "$GAMEFLOW_API_KEY"` and `gameflow builds create …`. Or call the REST upload flow directly (see the `gameflow-servers` skill).
+Install the CLI, export PATH, set `GAMEFLOW_API_KEY` from the CI secret store, then run `gameflow builds create …`. No `login` step is needed. Or call the REST upload flow directly (see the `gameflow-servers` skill).

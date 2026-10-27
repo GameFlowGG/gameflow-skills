@@ -17,6 +17,7 @@ Account, API key and CLI setup live in the `gameflow` skill. The essentials, rep
 - Responses are camelCase and always include zero values. int64 fields come back as **strings**.
 - **The key never goes into a game client.** Only your backend, CI, and (if it calls the API) the dedicated server hold it.
 - Don't invent endpoints, CLI flags or SDK methods. If it isn't here or in the references, say "verify in the docs or API reference".
+- If the GameFlow docs MCP is connected, check each request body against `get_api_operation` before writing it. If a field name differs from this skill, **don't choose yourself or write code with either name**. The docs can be ahead of the deployed API, and the wrong name is silently dropped. Show the user both names and ask which one their environment accepts.
 
 ## 0. Prerequisites
 
@@ -81,12 +82,14 @@ Preferred: the CLI (install in the `gameflow` skill):
 ```bash
 gameflow builds create --game-id "$GAMEFLOW_GAME_ID" --file ./dist/server.zip --version "$(git rev-parse --short HEAD)"
 ```
+It reads `GAMEFLOW_API_KEY` from the environment, uploads single or multipart, and **waits for the build to finish** (exit code `6` if it fails), so there's nothing to poll afterwards. `gameflow games list` shows the game ids. Other commands (`builds status`, `servers logs --tail`, `servers stop --dry-run`) are in the `gameflow` skill's CLI reference.
+
 CI: `GameFlowGG/gameflow-deploy-action@v1` (inputs `api-key`, `game-id`, `file`, `version`; output `build-id`).
 
 REST (no CLI): run [scripts/upload-build.sh](scripts/upload-build.sh), or follow [references/upload-and-builds.md](references/upload-and-builds.md):
 - **≤ 100 MB:** `POST /v1/images/generate-upload-url` → `PUT uploadUrl` → `POST /v1/images/start-build`. The upload alone does not build.
 - **> 100 MB:** `multipart/create` → per part `multipart/part-url` + `PUT` (keep each `ETag`) → `multipart/complete`. Complete starts the build itself, so don't call start-build again.
-- **Poll** `GET /v1/images/builds/{buildId}` every ~10 s until `status` is `success` or `failed`. On failure read `message` and `GET /v1/images/builds/{buildId}/logs`.
+- **Poll** (REST only) `GET /v1/images/builds/{buildId}` every ~10 s until `status` is `success` or `failed`. On failure read `message` and `GET /v1/images/builds/{buildId}/logs`.
 
 New builds are **not** made current automatically. When the game has no current build, the latest successful build is used. Otherwise the user promotes the build in the dashboard (Game → Builds; promote and rollback are dashboard-only), which rolls the fleet. To test a build before promoting it, start a server with `buildId`.
 

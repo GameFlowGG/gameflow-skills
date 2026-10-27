@@ -25,6 +25,25 @@ List what's available without installing:
 npx skills add GameFlowGG/gameflow-skills --list
 ```
 
+## Connect the GameFlow docs MCP (recommended)
+
+The skills work alone, but with the docs MCP server your agent can also search the docs and look up any API endpoint's exact request and response. The server is read-only and needs no API key.
+
+**Claude Code:**
+```bash
+claude mcp add --transport http gameflow https://api.gameflow.gg/mcp
+```
+Add `--scope project` to save it to `.mcp.json` and share it with your team.
+
+**Cursor:** add to `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
+```json
+{ "mcpServers": { "gameflow": { "url": "https://api.gameflow.gg/mcp" } } }
+```
+
+**Other agents:** add a streamable HTTP MCP server named `gameflow` with the URL `https://api.gameflow.gg/mcp`.
+
+Restart the agent afterwards. The tools are `search_docs`, `read_doc`, `list_docs` and `get_api_operation`.
+
 ## Skills
 
 | Skill | Use it to |
