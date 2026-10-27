@@ -91,7 +91,7 @@ export PATH="$HOME/.gameflow/bin:$PATH"   # the installer only edits rc files; t
 gameflow whoami                            # uses GAMEFLOW_API_KEY from the environment; no login needed
 ```
 - The CLI doesn't read `.env` files. If the key lives only in `.env`, export it in the shell first, or store it once with `printf '%s' "$GAMEFLOW_API_KEY" | gameflow login --api-key-stdin`.
-- **Windows** (Git Bash included): the script doesn't run there. Download the binary from https://github.com/GameFlowGG/gameflow-cli-releases/releases instead.
+- **Windows:** the `sh` script doesn't run there, Git Bash included. In PowerShell run `irm https://install.gameflow.gg | iex`, then open a new terminal (or prepend `$env:USERPROFILE\.gameflow\bin` to `$env:Path`).
 - The CLI has more than build uploads: games, regions, build status and tags, and server launch, logs and stop. `gameflow schema` lists every command and flag as JSON. See [references/cli.md](references/cli.md).
 
 ## Choosing an architecture
