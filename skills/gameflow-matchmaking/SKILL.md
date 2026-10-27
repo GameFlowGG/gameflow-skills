@@ -44,7 +44,7 @@ Questions to ask:
 5. What is the game mode string (e.g. `ranked-1v1`)? Your backend must send it **exactly**.
 
 Checklist for the user:
-1. app.gameflow.gg → **Matchmaking → Create matchmaker**. Pick the game and give it a name.
+1. Create the matchmaker with `gameflow matchmakers create --game-id <id> --name <n>`, or app.gameflow.gg → **Matchmaking → Create matchmaker** (pick the game and give it a name). The flow below is dashboard-only.
 2. Start from a sample (FIFO, Ranked 5v5, Split by Mode) or build the graph: `Ticket Input → … → Team Composition → Output`.
 3. **Ticket Input**: set the game mode. The default is `default`, so change it. Add the custom attributes with their types.
 4. Configure the remaining nodes from the recipe, and fix every issue in the validation panel.
