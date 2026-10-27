@@ -21,6 +21,7 @@ Essentials (details in the `gameflow` skill):
 - Base URL `https://api.gameflow.gg/v1`, header `x-api-key: $GAMEFLOW_API_KEY`. A 404 on a known path usually means `/v1` is missing.
 - Write request JSON in **lowerCamelCase** (`playerId`, `gameMode`, `timeoutSeconds`). Responses are camelCase only. **Unknown or misspelled fields are silently dropped.** The **server payload** JSON is the exception: it is snake_case (`match_id`).
 - **The API key never ships in a game client.** Clients call your backend. `playerId` comes from **your** auth, never from the request body.
+- If the GameFlow docs MCP is connected, check each request body against `get_api_operation` before writing it. If a field name differs from this skill, **don't choose yourself or write code with either name**. The docs can be ahead of the deployed API, and the wrong name is silently dropped. Show the user both names and ask which one their environment accepts.
 
 ## 0. Prerequisites
 

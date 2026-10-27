@@ -16,6 +16,7 @@ Triage a broken GameFlow integration: collect facts, match the symptom, run the 
 - If you find a key in game-client code (Unity/Godot/Unreal client, browser, mobile), stop and flag it: move the call to the backend and rotate the key. That's a bug in its own right, whatever else is wrong.
 - Read-only checks first. Don't stop servers, delete builds or cancel tickets without asking.
 - Causes marked *(inferred)* come from reading the platform code, not from a documented guarantee.
+- A field the API silently ignores is often a renamed or misspelled field. If the GameFlow docs MCP is connected, compare the user's request body with `get_api_operation`. If the names differ, don't tell them to rename yet: the docs can be ahead of the deployed API. Show both names and suggest a test call to see which one takes effect.
 
 ## Step 1: Collect facts
 

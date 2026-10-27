@@ -29,7 +29,23 @@ Docs: https://docs.gameflow.gg · Dashboard: https://app.gameflow.gg · API: `ht
 
 If a skill isn't installed, install it with `npx skills add GameFlowGG/gameflow-skills --skill <name>`. If that's not possible, read the matching docs section at docs.gameflow.gg.
 
-If GameFlow docs MCP tools are available in this session (e.g. `search_docs`, `get_api_operation`), prefer them for exact field names and newer endpoints. They are more current than this skill.
+## GameFlow docs MCP
+
+GameFlow runs a read-only MCP server at `https://api.gameflow.gg/mcp`. It needs no auth and has 4 tools: `search_docs`, `read_doc`, `list_docs` and `get_api_operation`. It serves the published docs and API reference. These can be newer than these skills, and sometimes newer than the deployed API.
+
+**When the tools are connected:**
+- Before writing a request body or code that calls an endpoint, call `get_api_operation` for it and compare its field names with the skill's.
+  - If they differ, **don't choose yourself, and don't write code with either name yet.** The docs can document a change that isn't deployed, and unknown fields are dropped without an error, so the wrong name fails quietly.
+  - Show the user both names, and ask which one their environment accepts. A test call whose response shows the field took effect settles it.
+- Use `search_docs` for anything these skills don't cover before saying it isn't documented.
+- Guide pages (`read_doc`) still have the old errors these rules correct (snake_case JSON, paths without `/v1`). Where a guide and the rules below disagree, follow the rules.
+
+**When they aren't connected**, offer to set them up, once, at the start of GameFlow work. The user runs one of these:
+- **Claude Code:** `claude mcp add --transport http gameflow https://api.gameflow.gg/mcp` (add `--scope project` to share it through `.mcp.json`)
+- **Cursor:** `.cursor/mcp.json` with `{"mcpServers":{"gameflow":{"url":"https://api.gameflow.gg/mcp"}}}`
+- **Other agents:** add a streamable HTTP MCP server with that URL.
+
+The new tools usually appear only after the agent restarts.
 
 ## Non-negotiable rules
 
@@ -44,7 +60,7 @@ If GameFlow docs MCP tools are available in this session (e.g. `search_docs`, `g
    - Responses are camelCase only, so `res.ticket_id` is `undefined`.
    - Unknown request fields are silently dropped, so typos look like "X is required".
    - 64-bit integers come back as **strings** (`"durationMs": "53210"`), so parse them.
-5. **Don't invent endpoints, CLI subcommands or SDK methods.** If something isn't in these skills or the docs, say so and check `gameflow --help`, the API reference, or ask the user.
+5. **Don't invent endpoints, CLI subcommands or SDK methods.** If something isn't in these skills or the docs, say so and check `gameflow schema`, the docs MCP or API reference, or ask the user.
 6. **There is no sandbox.** For testing, suggest a separate game in the dashboard (e.g. "MyGame (staging)") rather than testing against production players.
 
 ## First-time setup
@@ -72,10 +88,11 @@ curl -sS https://api.gameflow.gg/v1/identity/me -H "x-api-key: $GAMEFLOW_API_KEY
 ```bash
 curl -fsSL https://install.gameflow.gg | sh
 export PATH="$HOME/.gameflow/bin:$PATH"   # the installer only edits rc files; this shell needs it now
-gameflow login --api-key "$GAMEFLOW_API_KEY"
-gameflow whoami
+gameflow whoami                            # uses GAMEFLOW_API_KEY from the environment; no login needed
 ```
-On Windows, download the binary from https://github.com/GameFlowGG/gameflow-cli-releases/releases instead. See [references/cli.md](references/cli.md).
+- The CLI doesn't read `.env` files. If the key lives only in `.env`, export it in the shell first, or store it once with `printf '%s' "$GAMEFLOW_API_KEY" | gameflow login --api-key-stdin`.
+- **Windows** (Git Bash included): the script doesn't run there. Download the binary from https://github.com/GameFlowGG/gameflow-cli-releases/releases instead.
+- The CLI has more than build uploads: games, regions, build status and tags, and server launch, logs and stop. `gameflow schema` lists every command and flag as JSON. See [references/cli.md](references/cli.md).
 
 ## Choosing an architecture
 
@@ -98,5 +115,5 @@ Full flow diagrams and the responsibilities of each component are in [references
 
 - [references/architecture.md](references/architecture.md): components, who calls what, data flow for each product
 - [references/api-conventions.md](references/api-conventions.md): auth, casing, int64 strings, errors, pagination, regions
-- [references/cli.md](references/cli.md): CLI install, login and builds; GitHub Actions
+- [references/cli.md](references/cli.md): CLI install, auth, every command, output and exit codes; GitHub Actions
 - [scripts/check-auth.sh](scripts/check-auth.sh): verify `GAMEFLOW_API_KEY` and list games

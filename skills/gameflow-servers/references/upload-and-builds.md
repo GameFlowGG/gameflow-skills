@@ -15,13 +15,13 @@ Pick one route:
 ```bash
 curl -fsSL https://install.gameflow.gg | sh
 export PATH="$HOME/.gameflow/bin:$PATH"          # the installer only edits rc files
-gameflow login --api-key "$GAMEFLOW_API_KEY"
 gameflow builds create --game-id "$GAMEFLOW_GAME_ID" --file ./dist/server.zip --version "v1.4.0-$(git rev-parse --short HEAD)"
 ```
 
 **Notes:**
-- `builds create` prints the build id.
-- No other subcommands or flags are documented. Run `gameflow --help` rather than guessing.
+- With `GAMEFLOW_API_KEY` set, no `login` step is needed.
+- `builds create` **waits for the image build** and prints `{buildId, status, message, imageUri, …}`. A failed build exits with code `6`. Don't poll the REST API afterwards; use `--no-wait` only if you want to poll yourself.
+- `gameflow builds status --build-id <id>` checks a build later. The full command list is in the `gameflow` skill's `references/cli.md`, and `gameflow schema` prints every flag.
 - Use a unique `--version` per upload, e.g. a tag or commit SHA. A duplicate is not rejected (the build id gets a random prefix), but it makes builds hard to tell apart.
 
 ## GitHub Actions
@@ -146,7 +146,7 @@ export async function uploadMultipart(file: string, version: string): Promise<st
 }
 ```
 
-## Poll the build
+## Poll the build (REST only; the CLI already waits)
 
 `GET /v1/images/builds/{buildId}` returns `{status, message, imageUri}`.
 - `status` is one of `queued`, `running`, `success` or `failed`.
