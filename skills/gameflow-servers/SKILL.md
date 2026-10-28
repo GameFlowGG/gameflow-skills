@@ -21,8 +21,8 @@ Account, API key and CLI setup live in the `gameflow` skill. The essentials, rep
 
 ## 0. Prerequisites
 
-1. `GAMEFLOW_API_KEY` works: `curl -sS https://api.gameflow.gg/v1/identity/me -H "x-api-key: $GAMEFLOW_API_KEY"` returns `{user, organization, isOwner}`. If not, use the `gameflow` skill.
-2. A game exists. Creating it is **dashboard-only**. Give the user this checklist (app.gameflow.gg → Games → Create Game):
+1. You're authenticated. With the CLI, `gameflow login` then `gameflow whoami`. With an API key: `curl -sS https://api.gameflow.gg/v1/identity/me -H "x-api-key: $GAMEFLOW_API_KEY"` returns `{user, organization, isOwner}`. If not, use the `gameflow` skill.
+2. A game exists. Create it with `gameflow games create --title <t> --engine <e> --port <p> --protocol UDP --region us-east` (more flags in the `gameflow` skill's CLI reference), or give the user this checklist (app.gameflow.gg → Games → Create Game). Fleet scaling and extra ports are dashboard-only. The values to decide are:
    - **Engine**: Unity, Unreal, Godot, Colyseus (Node) or Custom. For Godot, set the **engine version** to the exact editor version you export with (e.g. `4.4.1`).
    - **Port + protocol**: the port your server listens on *inside* the container (e.g. `7777`) and UDP, TCP or TLS. TLS = platform-terminated TLS for WebSocket/browser games. Add named extra ports if needed.
    - **Regions**: pick from what `GET /v1/regions/available` returns (currently `us-east`, `eu-central`).
@@ -82,7 +82,7 @@ Preferred: the CLI (install in the `gameflow` skill):
 ```bash
 gameflow builds create --game-id "$GAMEFLOW_GAME_ID" --file ./dist/server.zip --version "$(git rev-parse --short HEAD)"
 ```
-It reads `GAMEFLOW_API_KEY` from the environment, uploads single or multipart, and **waits for the build to finish** (exit code `6` if it fails), so there's nothing to poll afterwards. `gameflow games list` shows the game ids. Other commands (`builds status`, `servers logs --tail`, `servers stop --dry-run`) are in the `gameflow` skill's CLI reference.
+It uses the `gameflow login` session or `GAMEFLOW_API_KEY` (CI), uploads single or multipart, and **waits for the build to finish** (exit code `6` if it fails), so there's nothing to poll afterwards. `gameflow games list` shows the game ids. Other commands (`builds status`, `servers logs --tail`, `servers stop --dry-run`) are in the `gameflow` skill's CLI reference.
 
 CI: `GameFlowGG/gameflow-deploy-action@v1` (inputs `api-key`, `game-id`, `file`, `version`; output `build-id`).
 

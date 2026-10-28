@@ -65,18 +65,19 @@ The new tools usually appear only after the agent restarts.
 
 ## First-time setup
 
-Some steps can only be done by a human in the dashboard: the API has no public endpoint for them, and signup has a captcha. Give the user this checklist with the exact values, wait for confirmation, then verify through the API.
+Signup has a captcha, so a human has to do it in the dashboard. After that, the CLI can create games, matchmakers and rating models (`gameflow games create`, `matchmakers create`, `models create`); only designing a matchmaker's flow stays in the dashboard. Give the user this checklist with the exact values, wait for confirmation, then verify through the API.
 
 **Checklist for the user:**
 1. Sign up or sign in at https://app.gameflow.gg. An organization is created automatically.
-2. Go to **Settings → API Keys → Create Key**.
+2. **For the CLI, skip the key:** run `gameflow login` (see "Install the CLI" below) and approve in the browser.
+   **For code that calls the API** (your backend, a game server, CI), go to **Settings → API Keys → Create Key**.
    - Name it for where it will live (e.g. `local-dev`, `ci`, `game-backend`).
    - Prefer an expiry.
    - **Copy the secret now:** it is shown once.
    - The org can hold up to 3 active keys.
-3. Put it in your environment: `export GAMEFLOW_API_KEY=gf_...` (or your secret manager or `.env` file, which must be git-ignored).
+3. Put the key in your environment: `export GAMEFLOW_API_KEY=gf_...` (or your secret manager or `.env` file, which must be git-ignored).
 
-**Verify (agent):**
+**Verify (agent):** with the CLI, `gameflow whoami`. With an API key:
 ```bash
 curl -sS https://api.gameflow.gg/v1/identity/me -H "x-api-key: $GAMEFLOW_API_KEY"
 ```
@@ -88,11 +89,13 @@ curl -sS https://api.gameflow.gg/v1/identity/me -H "x-api-key: $GAMEFLOW_API_KEY
 ```bash
 curl -fsSL https://install.gameflow.gg | sh
 export PATH="$HOME/.gameflow/bin:$PATH"   # the installer only edits rc files; this shell needs it now
-gameflow whoami                            # uses GAMEFLOW_API_KEY from the environment; no login needed
+gameflow login                             # opens the browser; the user approves
+gameflow whoami
 ```
+- **On a dev machine, use `gameflow login`, not an environment variable.** Use `GAMEFLOW_API_KEY` for CI and headless shells, where there is no browser. It takes priority over a stored login.
 - The CLI doesn't read `.env` files. If the key lives only in `.env`, export it in the shell first, or store it once with `printf '%s' "$GAMEFLOW_API_KEY" | gameflow login --api-key-stdin`.
 - **Windows:** the `sh` script doesn't run there, Git Bash included. In PowerShell run `irm https://install.gameflow.gg | iex`, then open a new terminal (or prepend `$env:USERPROFILE\.gameflow\bin` to `$env:Path`).
-- The CLI has more than build uploads: games, regions, build status and tags, and server launch, logs and stop. `gameflow schema` lists every command and flag as JSON. See [references/cli.md](references/cli.md).
+- The CLI has more than build uploads: creating games, matchmakers and rating models, listing games, regions, build status and tags, and server launch, logs and stop. `gameflow schema` lists every command and flag as JSON. See [references/cli.md](references/cli.md).
 
 ## Choosing an architecture
 
