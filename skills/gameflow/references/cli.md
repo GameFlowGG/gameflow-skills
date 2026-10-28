@@ -10,7 +10,13 @@ gameflow version
 ```
 The installer puts the binary in `~/.gameflow/bin` and appends a PATH line to `~/.zshrc`, `~/.bashrc` or `~/.bash_profile`. **The current shell isn't updated**, so `curl … | sh && gameflow login …` fails unless you export PATH first, as shown above.
 
-**Windows:** download `gameflow-windows-<arch>` from https://github.com/GameFlowGG/gameflow-cli-releases/releases and put it on PATH. Or use WSL with the Linux steps. The install script exits on Windows, Git Bash included.
+**Windows (PowerShell):**
+```powershell
+irm https://install.gameflow.gg | iex
+$env:Path = "$env:USERPROFILE\.gameflow\bin;$env:Path"   # the installer only updates the user PATH for new terminals
+gameflow version
+```
+The `sh` script above exits on Windows, Git Bash included. Use the PowerShell command, WSL with the Linux steps, or download `gameflow-windows-<arch>` from https://github.com/GameFlowGG/gameflow-cli-releases/releases.
 
 ## Discover commands with `gameflow schema`
 
@@ -34,7 +40,7 @@ printf '%s' "$GAMEFLOW_API_KEY" | gameflow login --api-key-stdin
 gameflow whoami
 ```
 
-`GAMEFLOW_API_URL` overrides the base URL, which defaults to `https://api.gameflow.gg/v1`. If calls hit the wrong environment, check that variable in the shell profile first.
+The CLI talks to `https://api.gameflow.gg/v1`. If calls hit the wrong environment, check that `GAMEFLOW_API_URL` isn't set in the shell profile.
 
 ## Output and exit codes
 
