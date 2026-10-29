@@ -110,7 +110,8 @@ Ask what the game needs, then recommend one of these:
   - **Supabase edge functions:** documented at docs.gameflow.gg/backend-integrations/supabase.
   - **A small Node service:** see docs.gameflow.gg/backend-integrations/custom-backend and the public sample `GameFlowGG/gameflow-custom-game-backend`.
   - **Nakama:** a server-side TypeScript runtime module exposes RPCs that start and stop GameFlow servers. It's documented at docs.gameflow.gg/backend-integrations/nakama, and the key stays in Nakama's runtime config.
-  - Talo and EOS integrations are listed as coming soon. Don't promise them.
+  - **Talo:** Talo keeps players and lobbies (each lobby is a Talo channel), but it can't run your server code. A small function on Deno Deploy holds the key and starts a server when the lobby host asks. This is the lobby flow above, with no GameFlow matchmaking. It's documented at docs.gameflow.gg/backend-integrations/talo. Players must sign in with Talo player authentication; otherwise the function can't verify who is calling, and anyone who knows a host's alias ID could start or stop that lobby's server.
+  - EOS integration is listed as coming soon. Don't promise it.
 
 Full flow diagrams and the responsibilities of each component are in [references/architecture.md](references/architecture.md).
 
